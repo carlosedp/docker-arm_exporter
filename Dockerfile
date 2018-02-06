@@ -9,5 +9,5 @@ COPY .blank tmp/qemu-$ARCH-static* /usr/bin/
 
 COPY rpi_exporter /bin/rpi_exporter
 
-EXPOSE      9243
-ENTRYPOINT  [ "/bin/rpi_exporter" ]
+EXPOSE 9243
+CMD [ "/bin/rpi_exporter" ]
