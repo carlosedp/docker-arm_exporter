@@ -49,4 +49,4 @@ jobs:
               --target "$IMAGE:latest"
       env:
         # Overwrite env to avoid running stage for entire
-        TARGET=none ARCH=none TAG=none
+        TARGET=none ARCH=none TAG=none RELEASE=none
