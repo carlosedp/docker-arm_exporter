@@ -19,7 +19,8 @@ env:
 
 install:
   - DOWNLOAD_URL=$(curl -s https://api.github.com/repos/lukasmalkmus/rpi_exporter/releases/latest | grep "browser_download_url" | grep "$RELEASE" | cut -d\" -f4)
-  - curl -L -o ${BINARY}.tar.gz ${DOWNLOAD_URL} && tar zx -f ${BINARY}.tar.gz --strip-components=1 -C ${BINARY}
+  - curl -L -o ${BINARY}.tar.gz ${DOWNLOAD_URL}
+  - tar zvf ${BINARY}.tar.gz --strip-components=1 -C ${BINARY}
 
 script:
   - ./travis-build.sh
