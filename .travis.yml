@@ -1,0 +1,51 @@
+sudo: required
+
+services:
+ - docker
+
+language: bash
+
+env:
+  global:
+    - IMAGE=carlosedp/arm_exporter
+    - BINARY=rpi_exporter
+    - QEMU_VERSION=v2.9.1-1
+  matrix:
+    # TARGET = Base image architecture to be used
+    # ARCH = qemu binary to be downloaded from https://github.com/multiarch/qemu-user-static/releases
+    # TAG = Tag to be applied to the image when upload to DockerHub
+    - TARGET=arm64v8 ARCH=aarch64 TAG=arm64 RELEASE=arm64
+    - TARGET=arm32v6 ARCH=arm TAG=arm RELEASE=armv7
+
+install:
+  - DOWNLOAD_URL=$(curl -s https://api.github.com/repos/lukasmalkmus/rpi_exporter/releases/latest | grep "browser_download_url" | grep "$RELEASE" | cut -d\" -f4)
+  - curl -L -o ${BINARY}.tar.gz ${DOWNLOAD_URL} && tar zx -f ${BINARY}.tar.gz --strip-components=1 -C ${BINARY}
+
+script:
+  - ./travis-build.sh
+  - >
+    if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then
+      # Push image
+      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+      docker push "$IMAGE":"$TAG"
+    fi
+
+jobs:
+  include:
+    - stage: deploy
+      script:
+        - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+        - echo "Downloading manifest-tool"
+        - wget https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64
+        - mv manifest-tool-linux-amd64 manifest-tool
+        - chmod +x manifest-tool
+        - ./manifest-tool --version
+        - echo "Pushing manifest "$IMAGE":latest"
+        - >
+          ./manifest-tool push from-args \
+              --platforms linux/arm,linux/arm64 \
+              --template "$IMAGE:ARCH" \
+              --target "$IMAGE:latest"
+      env:
+        # Overwrite env to avoid running stage for entire
+        TARGET=none ARCH=none TAG=none
