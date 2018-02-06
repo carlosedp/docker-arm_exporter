@@ -9,13 +9,13 @@ env:
   global:
     - IMAGE=carlosedp/arm_exporter
     - BINARY=rpi_exporter
-    - QEMU_VERSION=v2.9.1-1
+    - QEMU_VERSION=v2.7.0
   matrix:
     # TARGET = Base image architecture to be used
     # ARCH = qemu binary to be downloaded from https://github.com/multiarch/qemu-user-static/releases
     # TAG = Tag to be applied to the image when upload to DockerHub
     - TARGET=arm64v8 ARCH=aarch64 TAG=arm64 RELEASE=arm64
-    - TARGET=arm32v6 ARCH=arm TAG=arm RELEASE=armv6
+    - TARGET=arm32v6 ARCH=arm TAG=arm RELEASE=armv7
 
 script:
   - DOWNLOAD_URL=$(curl -s https://api.github.com/repos/lukasmalkmus/rpi_exporter/releases/latest | grep "browser_download_url" | grep "$RELEASE" | cut -d\" -f4)

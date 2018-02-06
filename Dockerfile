@@ -1,9 +1,6 @@
 ARG target=arm32v6
 FROM $target/alpine
 
-# set version label
-LABEL maintainer="carlosedp"
-
 ARG arch=arm
 ENV ARCH=$arch
 
