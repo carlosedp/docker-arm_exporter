@@ -1,10 +1,11 @@
 ARG target=arm32v6
 FROM $target/alpine
 
-ARG arch=arm
-ENV ARCH=$arch
 # set version label
 LABEL maintainer="carlosedp"
+
+ARG arch=arm
+ENV ARCH=$arch
 
 # Trick docker build in case qemu binary is not in dir.
 COPY .blank tmp/qemu-$ARCH-static* /usr/bin/
