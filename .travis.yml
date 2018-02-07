@@ -3,16 +3,14 @@ sudo: required
 services:
  - docker
 
-language: go
-
-go:
-  - 1.9
+language: bash
 
 env:
   global:
     - IMAGE=carlosedp/arm_exporter
     - BINARY=rpi_exporter
     - QEMU_VERSION=v2.9.1-1
+    - GIMME_GO_VERSION=1.9.3
   matrix:
     # TARGET = Base image architecture to be used
     # ARCH = qemu binary to be downloaded from https://github.com/multiarch/qemu-user-static/releases
@@ -21,10 +19,14 @@ env:
     - TARGET=arm32v6 ARCH=arm TAG=arm RELEASE=armv7
 
 script:
+  - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | bash)"
+  - go env
+  - export GOPATH=$HOME/gopath
+  - export PATH=$HOME/gopath/bin:$PATH
   - go get -u -d -v github.com/Masterminds/glide
   - go get -u -d -v github.com/lukasmalkmus/rpi_exporter
-  - cd $GOPATH/src/github.com/Masterminds/glide && go install
-  - cd $GOPATH/src/github.com/lukasmalkmus/rpi_exporter
+  - cd "$GOPATH"/src/github.com/Masterminds/glide && go install
+  - cd "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter
   - glide install
   - export GOARCH="$TAG"
   - make test
