@@ -25,13 +25,15 @@ script:
   - export PATH=$HOME/gopath/bin:$PATH
   - go get -u -d -v github.com/Masterminds/glide
   - go get -u -d -v github.com/lukasmalkmus/rpi_exporter
-  - cd "$GOPATH"/src/github.com/Masterminds/glide && go install
-  - cd "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter
+  - pushd "$GOPATH"/src/github.com/Masterminds/glide
+  - go install
+  - pushd "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter
   - glide install
   - export GOARCH="$TAG"
-  - make test
-  - cp $BINARY $HOME
-  - cd $HOME
+  - make all
+  - popd
+  - popd
+  - cp "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter/rpi_exporter .
   - ./travis-build.sh
   - >
     if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then
