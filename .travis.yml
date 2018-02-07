@@ -30,6 +30,8 @@ script:
   - glide install
   - export GOARCH="$TAG"
   - make test
+  - cp $BINARY $HOME
+  - cd $HOME
   - ./travis-build.sh
   - >
     if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then
