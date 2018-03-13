@@ -23,15 +23,11 @@ script:
   - go env
   - export GOPATH=$HOME/gopath
   - export PATH=$HOME/gopath/bin:$PATH
-  - go get -u -d -v github.com/Masterminds/glide
   - go get -u -d -v github.com/lukasmalkmus/rpi_exporter
-  - pushd "$GOPATH"/src/github.com/Masterminds/glide
-  - go install
   - pushd "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter
-  - glide install
+  - dep ensure -vendor-only
   - export GOARCH="$TAG"
   - make all
-  - popd
   - popd
   - cp "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter/rpi_exporter .
   - ./travis-build.sh
