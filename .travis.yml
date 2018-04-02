@@ -24,8 +24,8 @@ script:
   - export GOPATH=$HOME/gopath
   - export PATH=$HOME/gopath/bin:$PATH
   - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-  - git clone -b develop https://github.com/lukasmalkmus/rpi_exporter.git $GOPATH/src/github.com/lukasmalkmus/rpi_exporter
-  - pushd "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter/
+  - go get -u -d -v github.com/lukasmalkmus/rpi_exporter
+  - pushd "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter
   - dep ensure -vendor-only
   - export GOARCH="$TAG"
   - make all
@@ -34,7 +34,7 @@ script:
   - ./travis-build.sh
   - >
     if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then
-      docker login -u="raymondmm" -p="$DOCKER_PASS"
+      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
       docker push "$IMAGE":"$TAG"
     fi
 
@@ -42,7 +42,7 @@ jobs:
   include:
     - stage: deploy
       script:
-        - docker login -u="raymondmm" -p="$DOCKER_PASS"
+        - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
         - echo "Downloading manifest-tool"
         - wget https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64
         - mv manifest-tool-linux-amd64 manifest-tool
