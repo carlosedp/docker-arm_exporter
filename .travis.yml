@@ -37,6 +37,7 @@ script:
       docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
       docker push "$IMAGE":"$TAG"
     fi
+
 jobs:
   include:
     - stage: deploy
