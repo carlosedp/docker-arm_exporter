@@ -24,13 +24,13 @@ script:
   - export GOPATH=$HOME/gopath
   - export PATH=$HOME/gopath/bin:$PATH
   - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-  - go get -u -d -v github.com/lukasmalkmus/rpi_exporter/tree/develop
-  - pushd "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter/tree/develop
+  - git clone -b develop https://github.com/lukasmalkmus/rpi_exporter.git $GOPATH/src/github.com/lukasmalkmus/rpi_exporter
+  - pushd "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter/
   - dep ensure -vendor-only
   - export GOARCH="$TAG"
   - make all
   - popd
-  - cp "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter//tree/develop/rpi_exporter .
+  - cp "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter/ .
   - ./travis-build.sh
   - >
     if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then
