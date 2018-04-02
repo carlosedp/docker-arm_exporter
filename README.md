@@ -6,6 +6,7 @@ ARM CPU temperature exporter for Prometheus. Exporter code by [Lukas Malkmus](ht
 
 Usage:
 
+## Docker Run
 Run the container in the same network as your Prometheus
 
     docker run -d \
@@ -13,10 +14,38 @@ Run the container in the same network as your Prometheus
       --restart always \
       --net=monitoring \
       -p 9243:9243 \
+      -v /etc/hostname:/etc/nodename:ro
+      -v /etc/localtime:/etc/localtime:ro
+      -v /etc/timezone:/etc/TZ:ro
       carlosedp/arm_exporter
 
+## Docker Compose File (yml)
 
-Add target to Prometheus:
+    rpi-exporter:
+        image: carlosedp/arm_exporter
+        environment:
+          - NODE_ID={{.Node.ID}}
+        volumes:
+          - /etc/hostname:/etc/nodename:ro
+          - /etc/localtime:/etc/localtime:ro
+          - /etc/timezone:/etc/TZ:ro
+        command:
+          - '--collector.textfile.directory=/etc/rpi_exporter/'
+        ports:
+          - 9243:9243
+        networks:
+          - monitoring
+        deploy:
+          mode: global
+    
+    networks:
+      monitoring:
+        driver: overlay
+
+## Docker Stack
+    docker stack deploy monitoring --compose-file docker-compose-monitoring.yml
+
+## Add target to Prometheus:
 
     - job_name: 'node'
       scrape_interval: 10s
