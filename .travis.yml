@@ -1,0 +1,58 @@
+sudo: required
+
+services:
+ - docker
+
+language: bash
+
+env:
+  global:
+    - IMAGE=carlosedp/arm_exporter
+    - BINARY=rpi_exporter
+    - QEMU_VERSION=v2.9.1-1
+    - GIMME_GO_VERSION=1.9.3
+  matrix:
+    # TARGET = Base image architecture to be used
+    # ARCH = qemu binary to be downloaded from https://github.com/multiarch/qemu-user-static/releases
+    # TAG = Tag to be applied to the image when upload to DockerHub
+    - TARGET=arm64v8 ARCH=aarch64 TAG=arm64 RELEASE=arm64
+    - TARGET=arm32v6 ARCH=arm TAG=arm RELEASE=armv7
+
+script:
+  - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | bash)"
+  - go env
+  - export GOPATH=$HOME/gopath
+  - export PATH=$HOME/gopath/bin:$PATH
+  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+  - go get -u -d -v github.com/lukasmalkmus/rpi_exporter
+  - pushd "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter
+  - dep ensure -vendor-only
+  - export GOARCH="$TAG"
+  - make all
+  - popd
+  - cp "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter/rpi_exporter .
+  - ./travis-build.sh
+  - >
+    if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then
+      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+      docker push "$IMAGE":"$TAG"
+    fi
+jobs:
+  include:
+    - stage: deploy
+      script:
+        - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+        - echo "Downloading manifest-tool"
+        - wget https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64
+        - mv manifest-tool-linux-amd64 manifest-tool
+        - chmod +x manifest-tool
+        - ./manifest-tool --version
+        - echo "Pushing manifest "$IMAGE":latest"
+        - >
+          ./manifest-tool push from-args \
+              --platforms linux/arm,linux/arm64 \
+              --template "$IMAGE:ARCH" \
+              --target "$IMAGE:latest"
+      env:
+        # Overwrite env to avoid running stage for entire
+        TARGET=none ARCH=none TAG=none RELEASE=none
