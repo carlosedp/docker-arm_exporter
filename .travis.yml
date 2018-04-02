@@ -30,7 +30,7 @@ script:
   - export GOARCH="$TAG"
   - make all
   - popd
-  - cp "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter/ .
+  - cp "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter/rpi_exporter .
   - ./travis-build.sh
   - >
     if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then
