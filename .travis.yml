@@ -34,7 +34,7 @@ script:
   - ./travis-build.sh
   - >
     if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then
-      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+      docker login -u="raymondmm" -p="$DOCKER_PASS"
       docker push "$IMAGE":"$TAG"
     fi
 
