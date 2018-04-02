@@ -7,7 +7,7 @@ language: bash
 
 env:
   global:
-    - IMAGE=carlosedp/arm_exporter
+    - IMAGE=raymondmm/arm_exporter
     - BINARY=rpi_exporter
     - QEMU_VERSION=v2.9.1-1
     - GIMME_GO_VERSION=1.9.3
@@ -24,13 +24,13 @@ script:
   - export GOPATH=$HOME/gopath
   - export PATH=$HOME/gopath/bin:$PATH
   - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-  - go get -u -d -v github.com/lukasmalkmus/rpi_exporter
-  - pushd "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter
+  - go get -u -d -v https://github.com/lukasmalkmus/rpi_exporter/tree/develop
+  - pushd "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter/tree/develop
   - dep ensure -vendor-only
   - export GOARCH="$TAG"
   - make all
   - popd
-  - cp "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter/rpi_exporter .
+  - cp "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter//tree/develop/rpi_exporter .
   - ./travis-build.sh
   - >
     if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then
@@ -42,7 +42,7 @@ jobs:
   include:
     - stage: deploy
       script:
-        - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+        - docker login -u="raymondmm" -p="$DOCKER_PASS"
         - echo "Downloading manifest-tool"
         - wget https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64
         - mv manifest-tool-linux-amd64 manifest-tool
