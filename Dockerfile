@@ -14,3 +14,4 @@ RUN chmod +x /etc/rpi_exporter/docker-entrypoint.sh
 
 ENTRYPOINT [ "/etc/rpi_exporter/docker-entrypoint.sh" ]
 EXPOSE 9243
+CMD ["/bin/rpi_exporter"]
