@@ -10,5 +10,5 @@ then
   exec "$@"
 else
   echo "No /etc/nodename has been set, running with no nodename identifier."
-  /bin/rpi_exporter
+  /bin/rpi_exporter "$@"
 fi
