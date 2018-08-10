@@ -14,9 +14,9 @@ Run the container in the same network as your Prometheus
       --restart always \
       --net=monitoring \
       -p 9243:9243 \
-      -v /etc/hostname:/etc/nodename:ro
-      -v /etc/localtime:/etc/localtime:ro
-      -v /etc/timezone:/etc/TZ:ro
+      -v /etc/hostname:/etc/nodename:ro \
+      -v /etc/localtime:/etc/localtime:ro \
+      -v /etc/timezone:/etc/TZ:ro \
       carlosedp/arm_exporter
 
 ## Docker Compose File (yml)
