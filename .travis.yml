@@ -10,7 +10,7 @@ env:
     - IMAGE=carlosedp/arm_exporter
     - BINARY=rpi_exporter
     - QEMU_VERSION=v2.9.1-1
-    - GIMME_GO_VERSION=1.9.3
+    - GIMME_GO_VERSION=1.12.7
   matrix:
     # TARGET = Base image architecture to be used
     # ARCH = qemu binary to be downloaded from https://github.com/multiarch/qemu-user-static/releases
@@ -23,14 +23,10 @@ script:
   - go env
   - export GOPATH=$HOME/gopath
   - export PATH=$HOME/gopath/bin:$PATH
-  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-  - go get -u -d -v github.com/lukasmalkmus/rpi_exporter
-  - pushd "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter
-  - dep ensure -vendor-only
-  - export GOARCH="$TAG"
-  - make all
+  - git clone https://github.com/lukasmalkmus/rpi_exporter
+  - pushd rpi_exporter
+  - GOARCH="$TAG" GOOS=linux go build .
   - popd
-  - cp "$GOPATH"/src/github.com/lukasmalkmus/rpi_exporter/rpi_exporter .
   - ./travis-build.sh
   - >
     if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then

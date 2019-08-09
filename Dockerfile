@@ -8,7 +8,7 @@ ENV NODE_ID=none
 # Trick docker build in case qemu binary is not in dir.
 COPY .blank tmp/qemu-$ARCH-static* /usr/bin/
 
-COPY rpi_exporter /bin/rpi_exporter
+COPY ./rpi_exporter/rpi_exporter /bin/rpi_exporter
 COPY ./docker-entrypoint.sh /etc/rpi_exporter/docker-entrypoint.sh
 RUN chmod +x /etc/rpi_exporter/docker-entrypoint.sh
 
