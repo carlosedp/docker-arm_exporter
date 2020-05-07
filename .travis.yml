@@ -1,55 +1,21 @@
 sudo: required
 
-services:
- - docker
-
 language: bash
 
 env:
   global:
-    - IMAGE=carlosedp/arm_exporter
-    - BINARY=rpi_exporter
-    - QEMU_VERSION=v2.9.1-1
-    - GIMME_GO_VERSION=1.12.7
-  matrix:
-    # TARGET = Base image architecture to be used
-    # ARCH = qemu binary to be downloaded from https://github.com/multiarch/qemu-user-static/releases
-    # TAG = Tag to be applied to the image when upload to DockerHub
-    - TARGET=arm64v8 ARCH=aarch64 TAG=arm64 RELEASE=arm64
-    - TARGET=arm32v6 ARCH=arm TAG=arm RELEASE=armv7
+    - DOCKER_REPO=carlosedp/arm_exporter
+    - GIMME_GO_VERSION=1.14.2
+    - ARCHS="linux/arm,linux/arm64"
 
-script:
-  - eval "$(curl -sL https://raw.githubusercontent.com/travis-ci/gimme/master/gimme | bash)"
-  - go env
-  - export GOPATH=$HOME/gopath
-  - export PATH=$HOME/gopath/bin:$PATH
-  - git clone https://github.com/lukasmalkmus/rpi_exporter
-  - pushd rpi_exporter
-  - GOARCH="$TAG" GOOS=linux go build .
-  - popd
-  - ./travis-build.sh
-  - >
-    if [ "$TRAVIS_BRANCH" == "master" -a "$TRAVIS_PULL_REQUEST" == "false" ]; then
-      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
-      docker push "$IMAGE":"$TAG"
-    fi
+before_install:
+    - curl -fsSL https://get.docker.com | sh
+    - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
+    - mkdir -p $HOME/.docker
+    - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
+    - sudo service docker start
+install:
+    - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+    - docker buildx create --name xbuilder --use
 
-jobs:
-  include:
-    - stage: deploy
-      script:
-        - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
-        - echo "Downloading manifest-tool"
-        - wget https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64
-        - mv manifest-tool-linux-amd64 manifest-tool
-        - chmod +x manifest-tool
-        - ./manifest-tool --version
-        - echo "Pushing manifest "$IMAGE":latest"
-        - >
-          ./manifest-tool push from-args \
-              --platforms linux/arm,linux/arm64 \
-              --template "$IMAGE:ARCH" \
-              --target "$IMAGE:latest"
-      env:
-        # Overwrite env to avoid running stage for entire
-        TARGET=none ARCH=none TAG=none RELEASE=none
+script: ./ci.sh
