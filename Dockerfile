@@ -5,6 +5,9 @@ ARG arch=arm
 ENV ARCH=$arch
 ENV NODE_ID=none
 
+# Required for GPU temperature to work
+RUN apk add raspberrypi
+
 # Trick docker build in case qemu binary is not in dir.
 COPY .blank tmp/qemu-$ARCH-static* /usr/bin/
 
