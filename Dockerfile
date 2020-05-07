@@ -1,14 +1,25 @@
-ARG target=arm32v6
-FROM $target/alpine
+# Builder container
+FROM golang:1.14 AS builder
 
-ARG arch=arm
-ENV ARCH=$arch
+WORKDIR $GOPATH
+
+ENV PROJECT github.com/lukasmalkmus/rpi_exporter
+ENV CGO_ENABLED=0
+
+RUN go get $PROJECT && \
+    cd $GOPATH/src/$PROJECT && \
+    go build -a -ldflags '-s -w -extldflags "-static"' -o main . && \
+    mv main /
+
+# Application Image
+FROM alpine
+
 ENV NODE_ID=none
 
-# Trick docker build in case qemu binary is not in dir.
-COPY .blank tmp/qemu-$ARCH-static* /usr/bin/
+# Required for GPU temperature scrape to work
+RUN apk add raspberrypi
 
-COPY ./rpi_exporter/rpi_exporter /bin/rpi_exporter
+COPY --from=builder /main /bin/rpi_exporter
 COPY ./docker-entrypoint.sh /etc/rpi_exporter/docker-entrypoint.sh
 RUN chmod +x /etc/rpi_exporter/docker-entrypoint.sh
 
