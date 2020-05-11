@@ -7,7 +7,7 @@ env:
   global:
     - DOCKER_REPO=carlosedp/arm_exporter
     - GIMME_GO_VERSION=1.14.2
-    - ARCHS="linux/arm,linux/arm64"
+    - ARCHS="linux/arm/v6,linux/arm/v7,linux/arm64"
 
 before_install:
     - curl -fsSL https://get.docker.com | sh
