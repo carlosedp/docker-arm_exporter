@@ -1,5 +1,9 @@
 # Builder container
-FROM golang:1.14 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.14 AS builder
+# Install a go wrapper script converting Docker's $TARGETPLATFORM to $GOARCH
+# and $GOARM environment variables for cross-compiling.
+COPY --from=tonistiigi/xx:golang / /
+ARG TARGETPLATFORM
 
 WORKDIR $GOPATH
 
