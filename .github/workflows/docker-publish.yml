@@ -11,7 +11,7 @@ on:
   push:
     branches: [ master ]
     # Publish semver tags as releases.
-    tags: [ 'latest' ]
+    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ master ]
 
@@ -36,12 +36,12 @@ jobs:
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-        
-        name: Login to DockerHub
-        uses: docker/login-action@v1 
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -61,6 +61,6 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/arm/v6,linux/arm/v7,linux/arm64
+          platforms: linux/arm,linux/arm64
